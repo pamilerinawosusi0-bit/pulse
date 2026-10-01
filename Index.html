@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pulse — Social</title>
+
+    <link rel="stylesheet" href="Style.css">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <div class="brand">pulse</div>
+
+        <div class="top-actions">
+            <button class="icon-btn" id="searchBtn">⌕</button>
+            <button class="icon-btn" id="messagesBtn">✉</button>
+        </div>
+    </header>
+
+
+    <!-- MAIN -->
+    <main>
+
+        <!-- STORIES -->
+        <section class="stories-wrap">
+            <div class="stories" id="stories"></div>
+        </section>
+
+
+        <!-- CREATE POST -->
+        <section class="composer card">
+
+            <div class="avatar">P</div>
+
+            <button class="composer-input" id="openComposer">
+                What's happening?
+            </button>
+
+            <button class="media-btn" id="quickMedia">
+                ＋
+            </button>
+
+        </section>
+
+
+        <!-- POSTS -->
+        <section id="feed" class="feed"></section>
+
+    </main>
+
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+
+        <button class="nav-item active" data-tab="home">
+            <span>⌂</span>
+            <small>Home</small>
+        </button>
+
+        <button class="nav-item" data-tab="explore">
+            <span>⌕</span>
+            <small>Explore</small>
+        </button>
+
+        <button class="nav-item create" id="navCreate">
+            <span>＋</span>
+            <small>Post</small>
+        </button>
+
+        <button class="nav-item" data-tab="notifications">
+            <span>♡</span>
+            <small>Alerts</small>
+        </button>
+
+        <button class="nav-item" data-tab="profile">
+            <span>◉</span>
+            <small>Profile</small>
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- CREATE POST MODAL -->
+<div class="modal hidden" id="postModal">
+
+    <div class="modal-card">
+
+        <div class="modal-head">
+            <h2>Create post</h2>
+
+            <button class="close-btn" id="closeModal">
+                ×
+            </button>
+        </div>
+
+
+        <textarea
+            id="postText"
+            maxlength="500"
+            placeholder="Write something..."
+        ></textarea>
+
+
+        <div
+            id="mediaPreview"
+            class="media-preview hidden">
+        </div>
+
+
+        <div class="composer-tools">
+
+            <label class="tool-btn">
+
+                📷 Photo/Video
+
+                <input
+                    id="mediaInput"
+                    type="file"
+                    accept="image/*,video/*"
+                    hidden
+                >
+
+            </label>
+
+
+            <button class="tool-btn" id="emojiBtn">
+                😊 Emoji
+            </button>
+
+        </div>
+
+
+        <button class="publish-btn" id="publishBtn">
+            Post
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- COMMENTS MODAL -->
+<div class="modal hidden" id="commentsModal">
+
+    <div class="modal-card comments-card">
+
+        <div class="modal-head">
+
+            <h2>Comments</h2>
+
+            <button class="close-btn" id="closeComments">
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="commentsList" class="comments-list"></div>
+
+
+        <div class="comment-box">
+
+            <input
+                id="commentInput"
+                maxlength="200"
+                placeholder="Write a comment..."
+            >
+
+            <button id="sendComment">
+                Post
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<script src="Script.js"></script>
+
+</body>
+</html>
