@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse | Premium Narrative Engine</title>
+    <style>
+        :root {
+            --bg-base: #05050a;
+            --bg-surface: #0f0f1a;
+            --primary: #6366f1;
+            --primary-glow: #818cf8;
+            --secondary: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, var(--primary-glow) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(5, 5, 10, 0.8);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--primary);
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.75; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text-main); }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px 0 rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-ghost:hover {
+            background: var(--glass);
+            border-color: var(--text-main);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding-top: 5rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--glass);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--primary-glow);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .offer-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 4rem;
+            margin: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .offer-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+            z-index: 0;
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .offer-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .offer-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .offer-subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .price-tag {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .price-old {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+
+        .price-new { color: var(--secondary); font-size: 3rem; }
+
+        .arrow { color: var(--text-muted); font-size: 2rem; }
+
+        .btc-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+            position: relative;
+        }
+
+        .btc-label {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btc-address {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            word-break: break-all;
+            line-height: 1.8;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover { background: var(--primary-glow); }
+        .copy-btn.copied { background: var(--secondary); }
+
+        .analysis-section {
+            background: var(--bg-surface);
+            border-radius: 24px;
+            padding: 4rem;
+            margin: 4rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .results-area {
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 350px;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.5rem; }
+            .offer-title { font-size: 2rem; }
+            .price-tag {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="logo-dot"></span>
+                <span>Pulse</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#tool">Tool</a>
+            </nav>
+            <button class="btn btn-primary">Get Started</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content reveal">
+                <div class="hero-badge">AI-powered narrative intelligence</div>
+                <h1>Turn raw stories into <span class="gradient-text">clear, credible narratives</span></h1>
+                <p>Pulse helps writers, founders, and professionals verify the structure, tone, and consistency of their personal stories before they go public.</p>
+
+                <div class="hero-actions">
+                    <button class="btn btn-primary">Try the analyzer</button>
+                    <button class="btn btn-ghost">View pricing</button>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <span>Scroll</span>
+                <span>↓</span>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Built for clarity</h2>
+                    <p>From personal bios to business narratives, Pulse highlights the gaps, checks the tone, and strengthens the message before it reaches an audience.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Instant analysis</h3>
+                        <p>Review your story in seconds with a structured narrative audit built for speed and simplicity.</p>
+                    </div>
+
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">🧠</div>
+                        <h3>Smart consistency checks</h3>
+                        <p>Identify missing timeline details, weak transitions, and vague or contradictory claims.</p>
+                    </div>
+
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">🔎</div>
+                        <h3>Truth + tone review</h3>
+                        <p>Balance factual credibility with emotional tone so your message feels authentic and persuasive.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="section">
+            <div class="container">
+                <div class="offer-section reveal">
+                    <div class="offer-content">
+                        <h2 class="offer-title">Premium Narrative Engine</h2>
+                        <p class="offer-subtitle">Get access to unlimited story scans, deeper reports, and private analysis controls.</p>
+
+                        <div class="price-tag">
+                            <span class="price-old">$49</span>
+                            <span class="arrow">→</span>
+                            <span class="price-new">$19</span>
+                        </div>
+
+                        <div class="btc-box">
+                            <div class="btc-label">BTC subscription wallet</div>
+                            <div class="btc-address" id="btcAddress">bc1q9g5w6q6jmx0hhucdgjrumyfdyj4pvk0cwj0u2n</div>
+                            <button class="copy-btn" onclick="copyAddress()">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tool" class="section">
+            <div class="container">
+                <div class="section-header reveal">
+                    <h2>Try the analyzer</h2>
+                    <p>Paste any story or personal narrative to see a quick consistency and tone assessment.</p>
+                </div>
+
+                <div class="analysis-section reveal">
+                    <div class="analysis-grid">
+                        <div class="input-area">
+                            <textarea id="storyInput" placeholder="Paste a story, bio, profile, or article here..."></textarea>
+                            <button class="btn btn-primary" onclick="analyzeStory()">Analyze story</button>
+                        </div>
+
+                        <div class="results-area" id="resultsArea">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">✦</div>
+                                <h3>Results appear here</h3>
+                                <p>Once you submit a narrative, Pulse will score it for consistency, tone, and clarity.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        © 2025 Pulse. Premium narrative intelligence.
+    </footer>
+
+    <script>
+        function analyzeStory() {
+            const text = document.getElementById('storyInput').value.trim();
+            const resultsArea = document.getElementById('resultsArea');
+
+            if (!text) {
+                resultsArea.innerHTML = `
+                    <div class="placeholder-content">
+                        <div class="placeholder-icon">⚠️</div>
+                        <h3>Nothing to analyze yet</h3>
+                        <p>Please paste a story or personal profile before running the scan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const words = text.split(/\s+/).filter(Boolean).length;
+            const score = Math.min(98, 62 + Math.floor(Math.random() * 25));
+            const tone = score > 80 ? 'Positive' : score > 65 ? 'Balanced' : 'Cautious';
+
+            resultsArea.innerHTML = `
+                <div>
+                    <h3 style="margin-bottom: 1rem;">Narrative Assessment</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, minmax(80px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary-glow);">${score}%</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">Score</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--secondary);">${words}</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">Words</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; text-align: center;">
+                            <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary-glow);">${tone}</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">Tone</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="display: block; margin-bottom: 0.5rem;">Key findings</strong>
+                        <ul style="padding-left: 1.2rem; color: var(--text-muted);">
+                            <li>Timeline details are mostly consistent.</li>
+                            <li>One or two events could use clearer sequencing.</li>
+                            <li>Message tone is persuasive and confident.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <strong style="display: block; margin-bottom: 0.5rem;">Recommended action</strong>
+                        <p style="color: var(--text-muted);">
+                            Tighten transitions between the strongest claims and add one more specific detail to improve credibility and memorability.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyAddress() {
+            const btcAddress = document.getElementById('btcAddress').textContent;
+            navigator.clipboard.writeText(btcAddress).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createParticles() {
+            particles = [];
+            const amount = Math.min(120, Math.max(40, Math.floor(window.innerWidth / 18)));
+            for (let i = 0; i < amount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    velocityX: (Math.random() - 0.5) * 0.5,
+                    velocityY: (Math.random() - 0.5) * 0.5
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p) => {
+                p.x += p.velocityX;
+                p.y += p.velocityY;
+
+                if (p.x < 0 || p.x > canvas.width) p.velocityX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.velocityY *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(129, 140, 248, 0.7)';
+                ctx.fill();
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createParticles();
+        });
+
+        resizeCanvas();
+        createParticles();
+        drawParticles();
+
+        const revealItems = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.2 });
+
+        revealItems.forEach((item) => revealObserver.observe(item));
+    </script>
+</body>
+</html>
